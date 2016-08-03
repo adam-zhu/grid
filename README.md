@@ -4,7 +4,7 @@ TV ratings grid report generator. Uses sample Rentrak data served from file serv
 
 ### [live demo](http://adamz.hu/grid/index.html)
 
-# motivation
+## motivation
 to build a client side application capable of effciently generating and rendering views based on large sets of data
 
 
