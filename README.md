@@ -1,11 +1,11 @@
-# NASA flickr feed viewer
+# rentrak ratings grid generator demo
 
-A feed viewer for the NASA Goddard Photo & Video flickr account, user id 24662369@N07.
+TV ratings grid report generator. Uses sample Rentrak data served from file server.
 
-### [Live demo](http://adamz.hu/fedexercise/index.html)
+### [Live demo](http://adamz.hu/grid/index.html)
 
 
 #### Built with:
-- flickr api
 - maquette.js
 - lodash.js
+- immutable.js
