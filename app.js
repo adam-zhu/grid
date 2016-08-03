@@ -260,7 +260,6 @@
     var demoCt = 0;
     for (var i=0, len=state.selectedDemos.length; i<len; i++) {
       if (_.find(state.queriedDemos, function(d) {return d.id == state.selectedDemos[i].id && d.hasData})) {
-        //tableHeaderRow.push(h('span.duration.cell', {key: state.selectedDemos[i].id+'durationHeader'}, ''));
         tableHeaderRow.push(
           h('span.cell', {
             key: state.selectedDemos[i].id+'-headerCell'
@@ -285,7 +284,6 @@
     demoCt = 0;
     for (var i=0, len=state.selectedDemos.length; i<len; i++) {
       if (_.find(state.queriedDemos, function(d) {return d.id == state.selectedDemos[i].id && d.hasData})) {
-        //tableHeaderRow.push(h('span.duration.cell', {key: state.selectedDemos[i].id+'durationHeader'}, ''));
         tableHeaderRow.push(
           h('span.cell.headerCell', {
             key: state.selectedDemos[i].id+'-headerCell'
@@ -305,7 +303,6 @@
     );
 
 
-    //data.toArray().forEach(function(timeSlot, index) {
     var dataTimeSlots = data.toArray();
     for (var index=0, l=dataTimeSlots.length; index<l; index++) {
       var timeSlot = dataTimeSlots[index],
@@ -324,10 +321,7 @@
               duration = [],
               demoCt = 0;
           for (var j=0, length=state.demoCount; j<length; j++) {
-          //for (var j=0, length=selectedDemos.length; j<length; j++) {
             var demo = selectedDemos[j];
-            /*if (demoCt >= state.demoCount)
-              break;*/
             if (timeSlot && demo) {
               var timeSlotStation = timeSlot.stations.get(station.id),
                   programAccumulates = state.programAccumulates;
@@ -339,9 +333,6 @@
                       thisDuration = programChunks ? programChunks.length : -1;
                   duration.push(programChunks ? programChunks.length : -1);
                   seriesName = stationDemo.seriesName;
-                  /*row.push(
-                    h('span.duration.cell', {key: demo}, thisDuration > 0 ? thisDuration*15/60+'hr' : '---')
-                  );*/
                   row.push(
                     h('span.cell', {
                       key: station.id+''+demo.id+'rt'
@@ -352,9 +343,6 @@
                   );
                 } else {
                   if (_.find(state.queriedDemos, function(d) {return d.id == demo.id && d.hasData})) {
-                    /*row.push(
-                      h('span.duration.cell', {key: demo}, '---')
-                    );*/
                     row.push(
                       h('span.cell', {
                           key: station.id+''+demo.id
@@ -374,7 +362,6 @@
           h('div.row', {
             key: index+''+station.id
           }, [
-            //h('span.time', Math.floor(index/4)+':'+index%4*15),
             h('span.time', timeSlotToTime(index)),
             h('span.stationName', selectedStationName),
             h('span.seriesName', seriesName),
@@ -386,7 +373,6 @@
       }
       tableBody.push(h('div.timeSlot.'+index, timeSlotRows))
     }
-    //});
 
       return  h('div.grid',
                 h('div.gridHeader', tableHeader),
