@@ -176,14 +176,22 @@
     //console.log(state)
     var components = [];
 
+    components.push(h('h1', 'Single Day Grid'));
+    components.push(h('h2.market', 'New York market, April 16 2016'));
+
     if (state.availableStations)
       components.push(renderSelect(state.availableStations, 'stations', handleSelect));
     if (state.availableDemos)
       components.push(renderSelect(state.availableDemos, 'demos', handleSelect));
 
-    components.push(
-      renderTimeGrid(state.selectedStations, state.selectedDemos, state.timeSlotData)
-    );
+
+    if (state.selectedDemos.length > 0 && state.selectedStations.length > 0) {
+      components.push(
+        renderTimeGrid(state.selectedStations, state.selectedDemos, state.timeSlotData)
+      );
+    } else {
+      components.push(h('p', 'select stations and demographics to view grid data'));
+    }
 
 
     return h('div', components);

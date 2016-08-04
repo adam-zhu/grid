@@ -13,6 +13,12 @@ body {
 	-webkit-font-smoothing: antialiased;
 	overflow-x: scroll;
 }
+h1,h2,p {
+	margin-left: 40px;
+}
+.market {
+	margin-bottom: 20px;
+}
 select {
 	height: 240px;
 	margin-left: 40px;
@@ -100,6 +106,9 @@ span {
 .cell .rating {
 	width: 40px;
 	display: inline-block;
+}
+.placeholder {
+	color: #262626 !important;
 }
 .rating, .placeholder {
 	font-family: 'Roboto Mono';
