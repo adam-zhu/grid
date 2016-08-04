@@ -16,6 +16,11 @@ body {
 h1,h2,p {
 	margin-left: 40px;
 }
+p {
+	margin-top: 40px;
+	font-size: 18px;
+	font-family: 'Roboto Mono';
+}
 .market {
 	margin-bottom: 20px;
 }
