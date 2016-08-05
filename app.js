@@ -83,19 +83,20 @@
         var timeSlots = response[0].dates[0].timeSlots,
             gridData = [],
             timeSlotData = state.timeSlotData,
-            queriedDemos = _.clone(state.queriedDemos),
-            programAccumulates = _.clone(state.programAccumulates);
+            queriedDemos = state.queriedDemos,
+            programAccumulates = state.programAccumulates;
 
         timeSlots.sort(function(a,b){return a.timeSlot-b.timeSlot});
         _.find(state.queriedDemos, function(d) {return d.id == demo}).hasData = true;
 
         timeSlots.forEach(function(timeSlot, index) {
           timeSlot.stations.map(function(station){
+            var demoData = station.demographics[0];
             station.programId = demo+""+station.programId+""+station.stationId+station.episodeName;
             if (programAccumulates.has(station.programId)) {
-              programAccumulates.set(station.programId, programAccumulates.get(station.programId).concat(station.demographics[0]));
+              programAccumulates.set(station.programId, programAccumulates.get(station.programId).concat({rt: demoData.rt}));
             } else {
-              programAccumulates.set(station.programId, [].concat(station.demographics[0]));
+              programAccumulates.set(station.programId, [].concat({rt: demoData.rt}));
             }
           });
         });
@@ -104,21 +105,23 @@
           if (timeSlotData.get(index)) {
             timeSlots[index].stations.map(function(station) {
               var programChunks = programAccumulates.get(station.programId),
-                  duration = programChunks.length;
+                  duration = programChunks.length,
+                  stationData = new Immutable.Map(),
+                  demoData = station.demographics[0];
               if (timeSlotData.get(index).stations.has(station.stationId)) {
                 var thisStationData = timeSlotData.get(index).stations.get(station.stationId);
-                if (!thisStationData.has(station.demographics[0].demographicId)) {
+                if (!thisStationData.has(demoData.demographicId)) {
                   timeSlotData = timeSlotData.set(
                     index,
                     {
                       stations: timeSlotData.get(index).stations.set(
                         station.stationId,
-                        thisStationData.set(station.demographics[0].demographicId, {
+                        thisStationData.set(demoData.demographicId, {
                           episodeName: station.episodeName,
                           programId: station.programId,
                           duration: duration,
                           seriesName: station.seriesName,
-                          ratings: _.clone(station.demographics[0]),
+                          ratings: {rt: demoData.rt},
                           avg: getAverage(programChunks)
                         })
                       )
@@ -126,12 +129,12 @@
                   );
                 }
               } else {
-                var stationData = new Immutable.Map().set(station.demographics[0].demographicId, {
+                stationData = stationData.set(demoData.demographicId, {
                   episodeName: station.episodeName,
                   programId: station.programId,
                   seriesName: station.seriesName,
                   duration: duration,
-                  ratings: _.clone(station.demographics[0]),
+                  ratings: {rt: demoData.rt},
                   avg: getAverage(programChunks)
                 });
                 timeSlotData = timeSlotData.set(
@@ -147,12 +150,13 @@
             timeSlots[index].stations.map(function(station) {
               var programChunks = programAccumulates.get(station.programId),
                   duration = programChunks.length,
-                  stationData = new Immutable.Map().set(station.demographics[0].demographicId, {
+                  demoData = station.demographics[0],
+                  stationData = new Immutable.Map().set(demoData.demographicId, {
                     episodeName: station.episodeName,
                     programId: station.programId,
                     seriesName: station.seriesName,
                     duration: duration,
-                    ratings: _.clone(station.demographics[0]),
+                    ratings: {rt: demoData.rt},
                     avg: getAverage(programChunks)
                   });
               stationsMap = stationsMap.set(station.stationId, stationData);
@@ -167,12 +171,14 @@
           queriedDemos: queriedDemos,
           programAccumulates: programAccumulates
         });
-        console.log('ingest completed in '+(Date.now()-timer)/1000+'s')
+        console.log('ingest complete '+(Date.now()-timer)/1000+'s')
       break;
     }
   }
 
   function render() {
+    //console.log('rendering...')
+    var timer = Date.now();
     //console.log(state)
     var components = [];
 
@@ -193,7 +199,7 @@
       components.push(h('p', 'select stations and demographics to view grid data'));
     }
 
-
+    //console.log('render complete '+(Date.now()-timer)/1000+'s')
     return h('div', components);
   }
 
@@ -230,7 +236,7 @@
     });
     
     if (type == 'demos') {
-      var queriedDemos = _.clone(state.queriedDemos);
+      var queriedDemos = state.queriedDemos;
       selected.map(function(option) {
         if (!_.find(state.queriedDemos, function(d) {return d.id == option.id})) {
           getData(20160416, 270, 'demoData', ingest, parseInt(option.id));
@@ -311,9 +317,10 @@
     );
 
 
-    var dataTimeSlots = data.toArray();
-    for (var index=0, l=dataTimeSlots.length; index<l; index++) {
-      var timeSlot = dataTimeSlots[index],
+    //var dataTimeSlots = data.toArray();
+    //for (var index=0, l=dataTimeSlots.length; index<l; index++) {
+    for (var index=0, l=data.size; index<l; index++) {
+      var timeSlot = data.get(index),
           timeSlotRows = [];
       if (ct >= state.count)
           break;
@@ -396,18 +403,18 @@
   }
 
   function getAverage(rows) {
-    var avg = {aa: 0.0, pt: 0.0, rt: 0.0, sh: 0.0};
+    var avg = {rt: 0};
     rows.map(function(row) {
-      avg.aa += parseFloat(row.aa);
-      avg.pt += parseFloat(row.pt);
-      avg.rt += parseFloat(row.rt);
-      avg.sh += parseFloat(row.sh);
+      //avg.aa += (+row.aa);
+      //avg.pt += (+row.pt);
+      avg.rt += (+row.rt);
+      //avg.sh += (+row.sh);
     });
-    avg.aa = Math.floor(avg.aa/rows.length * 100)/100;
-    avg.pt = Math.floor(avg.pt/rows.length * 100)/100;
+    //avg.aa = Math.floor(avg.aa/rows.length * 100)/100;
+    //avg.pt = Math.floor(avg.pt/rows.length * 100)/100;
     avg.rt = Math.floor(avg.rt/rows.length * 100)/100;
-    avg.sh = Math.floor(avg.sh/rows.length * 100)/100;
-    return avg
+    //avg.sh = Math.floor(avg.sh/rows.length * 100)/100;
+    return avg;
   }
 
 
