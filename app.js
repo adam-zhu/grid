@@ -180,7 +180,8 @@
     //console.log('rendering...')
     var timer = Date.now();
     //console.log(state)
-    var components = [];
+    var components = [],
+        missingDemos = [];
 
     components.push(h('h1', 'Single Day Grid'));
     components.push(h('h2.market', 'New York market, April 16 2016'));
@@ -189,6 +190,18 @@
       components.push(renderSelect(state.availableStations, 'stations', handleSelect));
     if (state.availableDemos)
       components.push(renderSelect(state.availableDemos, 'demos', handleSelect));
+
+    state.selectedDemos.forEach(function(demo) {
+      if (_.find(state.queriedDemos, function(d) {return d.id === demo.id && !d.hasData})) {
+        missingDemos.push(demo.name+', ');
+      }
+    });
+
+    if (missingDemos.length > 0) {
+      components.push(
+        h('p.missingDemos', 'missing demos: ', missingDemos)
+      );
+    }
 
 
     if (state.selectedDemos.length > 0 && state.selectedStations.length > 0) {
@@ -273,6 +286,8 @@
 
     var demoCt = 0;
     for (var i=0, len=state.selectedDemos.length; i<len; i++) {
+      if (demoCt >= state.demoCount)
+        break;
       if (_.find(state.queriedDemos, function(d) {return d.id == state.selectedDemos[i].id && d.hasData})) {
         tableHeaderRow.push(
           h('span.cell', {
@@ -281,8 +296,6 @@
         );
         demoCt++;
       }
-      if (demoCt >= state.demoCount)
-        break;
     }
 
     tableHeader.push(
@@ -297,6 +310,8 @@
 
     demoCt = 0;
     for (var i=0, len=state.selectedDemos.length; i<len; i++) {
+      if (demoCt >= state.demoCount)
+        break;
       if (_.find(state.queriedDemos, function(d) {return d.id == state.selectedDemos[i].id && d.hasData})) {
         tableHeaderRow.push(
           h('span.cell.headerCell', {
@@ -308,8 +323,6 @@
         );
         demoCt++;
       }
-      if (demoCt >= state.demoCount)
-        break;
     }
 
     tableHeader.push(
@@ -317,8 +330,6 @@
     );
 
 
-    //var dataTimeSlots = data.toArray();
-    //for (var index=0, l=dataTimeSlots.length; index<l; index++) {
     for (var index=0, l=data.size; index<l; index++) {
       var timeSlot = data.get(index),
           timeSlotRows = [];
@@ -335,8 +346,10 @@
               seriesName = '---',
               duration = [],
               demoCt = 0;
-          for (var j=0, length=state.demoCount; j<length; j++) {
+          for (var j=0, length=selectedDemos.length; j<length; j++) {
             var demo = selectedDemos[j];
+            if (demoCt >= state.demoCount)
+              break; 
             if (timeSlot && demo) {
               var timeSlotStation = timeSlot.stations.get(station.id),
                   programAccumulates = state.programAccumulates;
@@ -357,17 +370,15 @@
                     ])
                   );
                 } else {
-                  if (_.find(state.queriedDemos, function(d) {return d.id == demo.id && d.hasData})) {
-                    row.push(
-                      h('span.cell', {
-                          key: station.id+''+demo.id
-                        }, [
-                          h('span.placeholder', {key: station.id+''+demo.id+'rt1'}, '---'),
-                          h('span.placeholder', {key: station.id+''+demo.id+'rt2'}, '---')
-                        ]
-                      )
-                    );
-                  }
+                  row.push(
+                    h('span.cell', {
+                        key: station.id+''+demo.id
+                      }, [
+                        h('span.placeholder', {key: station.id+''+demo.id+'rt1'}, '---'),
+                        h('span.placeholder', {key: station.id+''+demo.id+'rt2'}, '---')
+                      ]
+                    )
+                  );
                 }
               }
             }
@@ -405,15 +416,9 @@
   function getAverage(rows) {
     var avg = {rt: 0};
     rows.map(function(row) {
-      //avg.aa += (+row.aa);
-      //avg.pt += (+row.pt);
       avg.rt += (+row.rt);
-      //avg.sh += (+row.sh);
     });
-    //avg.aa = Math.floor(avg.aa/rows.length * 100)/100;
-    //avg.pt = Math.floor(avg.pt/rows.length * 100)/100;
     avg.rt = Math.floor(avg.rt/rows.length * 100)/100;
-    //avg.sh = Math.floor(avg.sh/rows.length * 100)/100;
     return avg;
   }
 

@@ -39,6 +39,15 @@ select option {
 	font-size: 15px;
 	font-family: 'Helvetica';
 }
+p.missingDemos {
+	display: inline-block;
+	width: 400px;
+	margin-left: 20px;
+	line-height: 14px;
+	font-size: 11px;
+	vertical-align: top;
+	color: red;
+}
 .grid {
 	white-space: nowrap;
 }
@@ -111,6 +120,7 @@ span {
 .cell .rating {
 	width: 40px;
 	display: inline-block;
+	vertical-align: text-bottom;
 }
 .placeholder {
 	color: #262626 !important;
@@ -120,6 +130,7 @@ span {
 }
 .avg {
 	font-family: 'Roboto';
+	line-height: 16px;
 }
 .demo {
 	width: 30px;
