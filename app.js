@@ -89,8 +89,11 @@
         timeSlots.sort(function(a,b){return a.timeSlot-b.timeSlot});
         _.find(state.queriedDemos, function(d) {return d.id == demo}).hasData = true;
 
+        // out of box programId not unique to station
+        // set unique programId
+        // push into accumulates
         timeSlots.forEach(function(timeSlot, index) {
-          timeSlot.stations.map(function(station){
+          timeSlot.stations.forEach(function(station) {
             var demoData = station.demographics[0];
             station.programId = demo+""+station.programId+""+station.stationId+station.episodeName;
             if (programAccumulates.has(station.programId)) {
@@ -103,7 +106,7 @@
 
         for (var index=0, len=timeSlots.length; index<len; index++) {
           if (timeSlotData.get(index)) {
-            timeSlots[index].stations.map(function(station) {
+            timeSlots[index].stations.forEach(function(station) {
               var programChunks = programAccumulates.get(station.programId),
                   duration = programChunks.length,
                   stationData = new Immutable.Map(),
@@ -147,7 +150,7 @@
             });
           } else {
             var stationsMap = new Immutable.Map();
-            timeSlots[index].stations.map(function(station) {
+            timeSlots[index].stations.forEach(function(station) {
               var programChunks = programAccumulates.get(station.programId),
                   duration = programChunks.length,
                   demoData = station.demographics[0],
